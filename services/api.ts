@@ -90,11 +90,13 @@ export const api = {
     const appointments = load<SareeAppointment[]>('ruchira_appointments_v2', []);
     
     // Double Booking Check: Same Service, Same Date, Same Time
+    const activeStatuses = ['Booked', 'Received', 'In Progress', 'Completed', 'Delivered'];
+    
     const isDoubleBooked = appointments.some(appt => 
       appt.service_id === data.service_id &&
       appt.appointment_date === data.appointment_date && 
       appt.appointment_time === data.appointment_time &&
-      appt.status !== 'Booked' // Check against active bookings
+      activeStatuses.includes(appt.status) // If status is any active status, it's booked.
     );
 
     if (isDoubleBooked) {

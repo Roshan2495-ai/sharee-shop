@@ -134,7 +134,17 @@ export const AdminDashboard: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {sareeServices.map(service => (
                             <div key={service.id} className="bg-white rounded-lg shadow overflow-hidden border border-gray-200">
-                                <img src={service.image} alt={service.name} className="w-full h-40 object-cover" />
+                                <div className="w-full h-40 bg-gray-100 flex items-center justify-center">
+                                    <img 
+                                        src={service.image} 
+                                        alt={service.name} 
+                                        className="w-full h-full object-cover" 
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                            e.currentTarget.parentElement!.innerText = service.name;
+                                        }}
+                                    />
+                                </div>
                                 <div className="p-4">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-bold text-lg">{service.name}</h3>
@@ -166,7 +176,20 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Image URL</label>
-                            <input type="text" className="w-full border p-2 rounded" value={serviceForm.image} onChange={e => setServiceForm({...serviceForm, image: e.target.value})} required />
+                            <input type="text" className="w-full border p-2 rounded mb-2" value={serviceForm.image} onChange={e => setServiceForm({...serviceForm, image: e.target.value})} required />
+                            {serviceForm.image && (
+                                <div className="w-full h-40 bg-gray-100 rounded overflow-hidden border">
+                                    <img 
+                                        src={serviceForm.image} 
+                                        alt="Preview" 
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none';
+                                        }}
+                                    />
+                                    <p className="text-xs text-center text-gray-400 p-2">Image Preview</p>
+                                </div>
+                            )}
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700">Description</label>

@@ -5,7 +5,8 @@ export const DEFAULT_SAREE_SERVICES: SareeService[] = [
   {
     id: 'srv-fold-01',
     name: 'Pre-Built Saree Folding',
-    image: 'https://images.unsplash.com/photo-1610189012906-4783382c59f4?q=80&w=800&auto=format&fit=crop',
+    // Image: Stack of folded fabrics/sarees
+    image: 'https://images.unsplash.com/photo-1574634534894-89d7576c8259?q=80&w=800&auto=format&fit=crop',
     description: 'Expert box folding service. We fold your saree into a compact, wrinkle-free shape perfect for storage or travel. Bring your saree, we fold it perfectly.',
     price_range: '₹150 - ₹300',
     status: 'Active'
@@ -13,7 +14,8 @@ export const DEFAULT_SAREE_SERVICES: SareeService[] = [
   {
     id: 'srv-pleat-02',
     name: 'Pre-Built Saree Pleating',
-    image: 'https://images.unsplash.com/photo-1583391733975-d22797e88241?q=80&w=800&auto=format&fit=crop',
+    // Image: Draped fabric with pleats
+    image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop',
     description: 'Professional pre-pleating service. We create perfect, ironed pleats (patli) that make draping your saree taking only 1 minute. Ready to wear.',
     price_range: '₹500 - ₹1200',
     status: 'Active'
