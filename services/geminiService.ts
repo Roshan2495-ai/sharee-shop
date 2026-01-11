@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 
-const apiKey = process.env.API_KEY || ''; // In a real app, ensure this is set securely
+// Robust access to environment variable that works in various build environments
+// In strict browser environments, 'process' might not be defined.
+const apiKey = (typeof process !== 'undefined' && process.env?.API_KEY) || '';
 
 let ai: GoogleGenAI | null = null;
 
