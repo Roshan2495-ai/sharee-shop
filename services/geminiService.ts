@@ -17,11 +17,10 @@ export const getAIRecommendation = async (userQuery: string): Promise<string> =>
 
     try {
         const model = 'gemini-3-flash-preview';
-        const systemInstruction = `You are a sophisticated and helpful Virtual Stylist for "Luxe Saree & Parlor". 
-        Your goal is to recommend Sarees or Parlor services based on the user's request. 
+        const systemInstruction = `You are a sophisticated and helpful Virtual Stylist for "RuChiRa". 
+        Your goal is to recommend Sarees based on the user's request. 
         Keep your tone elegant, warm, and professional. 
         If the user asks about Sarees, suggest types like Banarasi, Kanjivaram, Chiffon based on occasion.
-        If the user asks about beauty, suggest Facials, Makeup, or Hair Spas.
         Keep the response concise (under 100 words).`;
 
         const response = await ai.models.generateContent({

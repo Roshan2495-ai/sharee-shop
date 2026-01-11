@@ -34,7 +34,7 @@ export const AIStylist: React.FC<Props> = ({ onClose }) => {
       <div className="p-4 h-64 overflow-y-auto bg-rose-50">
         {!response && !loading && (
           <p className="text-gray-500 text-sm text-center mt-10">
-            Hi! I'm your personal stylist. Ask me for saree recommendations for a wedding, or the best facial for your skin type!
+            Hi! I'm your personal stylist. Ask me for saree recommendations for a wedding or daily wear!
           </p>
         )}
         {loading && (

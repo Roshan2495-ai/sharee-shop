@@ -2,12 +2,8 @@ import React, { useState } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import { Layout } from './components/Layout';
-import { Home } from './pages/Home';
-import { Shop } from './pages/Shop';
-import { Services } from './pages/Services';
-import { Cart } from './pages/Cart';
-import { Checkout } from './pages/Checkout';
-import { Booking } from './pages/Booking';
+import { ServiceDisplay } from './pages/ServiceDisplay';
+import { BookingForm } from './pages/BookingForm';
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -20,13 +16,9 @@ const App: React.FC = () => {
     <AppProvider>
       <Router>
         <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Layout><Home /></Layout>} />
-          <Route path="/shop" element={<Layout><Shop /></Layout>} />
-          <Route path="/services" element={<Layout><Services /></Layout>} />
-          <Route path="/cart" element={<Layout><Cart /></Layout>} />
-          <Route path="/checkout" element={<Layout><Checkout /></Layout>} />
-          <Route path="/book/:serviceId?" element={<Layout><Booking /></Layout>} />
+          {/* Main User Routes */}
+          <Route path="/" element={<Layout><ServiceDisplay /></Layout>} />
+          <Route path="/book-appointment" element={<Layout><BookingForm /></Layout>} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -55,7 +47,6 @@ const App: React.FC = () => {
            )}
            {isAiOpen && <AIStylist onClose={() => setIsAiOpen(false)} />}
         </div>
-
       </Router>
     </AppProvider>
   );
