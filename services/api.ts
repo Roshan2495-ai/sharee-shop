@@ -1,5 +1,5 @@
 import { Product, Service, Order, Appointment, User, PreBuiltOrder, SareeAppointment, SareeService } from '../types';
-import { DEFAULT_SAREE_SERVICE, MOCK_PRODUCTS } from '../constants';
+import { DEFAULT_SAREE_SERVICES, MOCK_PRODUCTS } from '../constants';
 
 const API_BASE_URL = ""; 
 
@@ -27,7 +27,7 @@ export const api = {
   // --- Backup/Restore ---
   downloadBackup: () => {
     const data = {
-      sareeService: load('ruchira_service', DEFAULT_SAREE_SERVICE),
+      sareeServices: load('ruchira_services_list', DEFAULT_SAREE_SERVICES),
       sareeAppointments: load('ruchira_appointments_v2', []),
       timestamp: new Date().toISOString(),
     };
@@ -35,43 +35,45 @@ export const api = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ruchira_service_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `ruchira_backup_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
   },
 
-  restoreBackup: (file: File): Promise<boolean> => {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target?.result as string);
-                if (data.sareeService) save('ruchira_service', data.sareeService);
-                if (data.sareeAppointments) save('ruchira_appointments_v2', data.sareeAppointments);
-                resolve(true);
-            } catch (err) {
-                console.error("Backup restore failed", err);
-                resolve(false);
-            }
-        };
-        reader.readAsText(file);
-    });
+  // --- SERVICE MANAGEMENT (CRUD) ---
+  getSareeServices: async (): Promise<SareeService[]> => {
+    if (isBackendLive()) return http<SareeService[]>('/services');
+    return load<SareeService[]>('ruchira_services_list', DEFAULT_SAREE_SERVICES);
   },
 
-  // --- SERVICE MANAGEMENT (NEW) ---
-  getSareeService: async (): Promise<SareeService> => {
-    if (isBackendLive()) return http<SareeService>('/service-details');
-    return load<SareeService>('ruchira_service', DEFAULT_SAREE_SERVICE);
+  addSareeService: async (service: SareeService): Promise<SareeService> => {
+    if (isBackendLive()) return http<SareeService>('/services', { method: 'POST', body: JSON.stringify(service) });
+    const services = load<SareeService[]>('ruchira_services_list', DEFAULT_SAREE_SERVICES);
+    const newServices = [...services, service];
+    save('ruchira_services_list', newServices);
+    return service;
   },
 
   updateSareeService: async (data: SareeService): Promise<void> => {
     if (isBackendLive()) {
-      await http('/service-details', { method: 'PUT', body: JSON.stringify(data) });
+      await http(`/services/${data.id}`, { method: 'PUT', body: JSON.stringify(data) });
       return;
     }
-    save('ruchira_service', data);
+    const services = load<SareeService[]>('ruchira_services_list', DEFAULT_SAREE_SERVICES);
+    const updated = services.map(s => s.id === data.id ? data : s);
+    save('ruchira_services_list', updated);
   },
 
-  // --- APPOINTMENTS (NEW) ---
+  deleteSareeService: async (id: string): Promise<void> => {
+    if (isBackendLive()) {
+        await http(`/services/${id}`, { method: 'DELETE' });
+        return;
+    }
+    const services = load<SareeService[]>('ruchira_services_list', DEFAULT_SAREE_SERVICES);
+    const filtered = services.filter(s => s.id !== id);
+    save('ruchira_services_list', filtered);
+  },
+
+  // --- APPOINTMENTS ---
   getSareeAppointments: async (): Promise<SareeAppointment[]> => {
     if (isBackendLive()) return http<SareeAppointment[]>('/appointments');
     return load<SareeAppointment[]>('ruchira_appointments_v2', []);
@@ -87,15 +89,16 @@ export const api = {
 
     const appointments = load<SareeAppointment[]>('ruchira_appointments_v2', []);
     
-    // Double Booking Check
+    // Double Booking Check: Same Service, Same Date, Same Time
     const isDoubleBooked = appointments.some(appt => 
+      appt.service_id === data.service_id &&
       appt.appointment_date === data.appointment_date && 
       appt.appointment_time === data.appointment_time &&
-      appt.status !== 'Booked' // Check active bookings
+      appt.status !== 'Booked' // Check against active bookings
     );
 
     if (isDoubleBooked) {
-      console.warn("Booking Failed: Slot taken.");
+      console.warn("Booking Failed: Slot taken for this service.");
       return null;
     }
 
@@ -139,7 +142,7 @@ export const api = {
     return load<User | null>('ruchira_user', null);
   },
 
-  // --- Legacy Stubs (To keep TS happy if legacy code runs) ---
+  // --- Legacy Stubs ---
   getProducts: async () => [],
   getServices: async () => [],
   getOrders: async () => [],
@@ -151,4 +154,5 @@ export const api = {
   getPreBuiltOrders: async () => [],
   createPreBuiltOrder: async (o: any) => o,
   updatePreBuiltOrder: async () => {},
+  restoreBackup: async () => true,
 };

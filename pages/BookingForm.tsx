@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { TIME_SLOTS } from '../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 export const BookingForm: React.FC = () => {
-  const { bookSareeAppointment, sareeService } = useApp();
+  const { bookSareeAppointment, sareeServices } = useApp();
   const navigate = useNavigate();
+  const { serviceId } = useParams();
+  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [selectedService, setSelectedService] = useState(sareeServices.find(s => s.id === serviceId));
+
+  useEffect(() => {
+    // If services load async or URL param changes
+    setSelectedService(sareeServices.find(s => s.id === serviceId));
+  }, [sareeServices, serviceId]);
   
   const [formData, setFormData] = useState({
     customer_name: '',
@@ -21,8 +29,13 @@ export const BookingForm: React.FC = () => {
     e.preventDefault();
     setError('');
 
+    if (!selectedService) {
+        setError("Invalid service selected.");
+        return;
+    }
+
     const isSuccess = await bookSareeAppointment({
-        service_id: sareeService.id,
+        service_id: selectedService.id,
         ...formData
     });
 
@@ -30,9 +43,20 @@ export const BookingForm: React.FC = () => {
         setSuccess(true);
         window.scrollTo(0,0);
     } else {
-        setError('The selected time slot is already booked. Please choose another.');
+        setError('The selected time slot is already booked for this service. Please choose another.');
     }
   };
+
+  if (!selectedService) {
+      return (
+          <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                  <h2 className="text-xl font-bold text-gray-700">Service Not Found</h2>
+                  <button onClick={() => navigate('/')} className="text-rose-600 underline mt-4">Return to Services</button>
+              </div>
+          </div>
+      );
+  }
 
   if (success) {
     return (
@@ -42,6 +66,9 @@ export const BookingForm: React.FC = () => {
                     <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
                 </div>
                 <h2 className="text-3xl font-serif font-bold text-gray-900 mb-2">Booking Confirmed!</h2>
+                <p className="text-gray-600 mb-2">
+                    Service: <strong>{selectedService.name}</strong>
+                </p>
                 <p className="text-gray-600 mb-6">
                     We will see you on <strong>{formData.appointment_date}</strong> at <strong>{formData.appointment_time}</strong>.
                 </p>
@@ -57,14 +84,20 @@ export const BookingForm: React.FC = () => {
   return (
     <div className="min-h-screen bg-rose-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-10">
-            <h1 className="text-3xl font-serif font-bold text-gray-900">Book Your Appointment</h1>
-            <p className="text-gray-600 mt-2">For {sareeService.name}</p>
+        <button onClick={() => navigate('/')} className="mb-6 flex items-center text-gray-500 hover:text-rose-600 transition">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Back to Services
+        </button>
+
+        <div className="text-center mb-8">
+            <h1 className="text-3xl font-serif font-bold text-gray-900">Book Appointment</h1>
+            <p className="text-rose-600 font-medium mt-2 text-lg">{selectedService.name}</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-            <div className="bg-rose-600 p-4 text-white text-sm font-medium text-center">
-                Bring Your Own Saree Service
+            <div className="bg-gray-900 p-4 flex items-center justify-between px-8">
+                 <span className="text-white text-sm font-medium">Service Only</span>
+                 <span className="text-rose-400 text-sm font-bold">{selectedService.price_range}</span>
             </div>
             
             <form onSubmit={handleSubmit} className="p-8 space-y-6">
@@ -100,7 +133,7 @@ export const BookingForm: React.FC = () => {
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
                     <textarea rows={3} className="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-rose-500 focus:border-rose-500"
-                        placeholder="Fabric type, special instructions..."
+                        placeholder="Any special instructions..."
                         value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} />
                 </div>
 
@@ -110,7 +143,7 @@ export const BookingForm: React.FC = () => {
                     </div>
                 )}
 
-                <button type="submit" className="w-full bg-gray-900 text-white font-bold py-4 rounded-lg hover:bg-gray-800 transition shadow-lg">
+                <button type="submit" className="w-full bg-rose-600 text-white font-bold py-4 rounded-lg hover:bg-rose-700 transition shadow-lg">
                     Confirm Appointment
                 </button>
             </form>

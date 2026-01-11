@@ -18,7 +18,7 @@ const App: React.FC = () => {
         <Routes>
           {/* Main User Routes */}
           <Route path="/" element={<Layout><ServiceDisplay /></Layout>} />
-          <Route path="/book-appointment" element={<Layout><BookingForm /></Layout>} />
+          <Route path="/book-appointment/:serviceId" element={<Layout><BookingForm /></Layout>} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User, SareeService, SareeAppointment, Product, CartItem, Order, Service, Appointment, PreBuiltOrder } from '../types';
+import { User, SareeService, SareeAppointment, Product, CartItem, Order, Service } from '../types';
 import { api } from '../services/api';
-import { DEFAULT_SAREE_SERVICE } from '../constants';
 
 interface AppContextType {
   user: User | null;
@@ -9,8 +8,10 @@ interface AppContextType {
   logout: () => void;
   
   // Core Service Data
-  sareeService: SareeService;
+  sareeServices: SareeService[];
+  addSareeService: (service: SareeService) => Promise<void>;
   updateSareeService: (data: SareeService) => Promise<void>;
+  deleteSareeService: (id: string) => Promise<void>;
   
   // Appointment Data
   sareeAppointments: SareeAppointment[];
@@ -29,25 +30,27 @@ interface AppContextType {
   updateOrderStatus: (id: string, status: any) => Promise<void>;
   addProduct: (p: any) => void;
   deleteProduct: (id: string) => void;
+  // Legacy PreBuilt
+  submitPreBuiltOrder: (o: any) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [sareeService, setSareeService] = useState<SareeService>(DEFAULT_SAREE_SERVICE);
+  const [sareeServices, setSareeServices] = useState<SareeService[]>([]);
   const [sareeAppointments, setSareeAppointments] = useState<SareeAppointment[]>([]);
 
   // Initial Data Load
   useEffect(() => {
     const initData = async () => {
-      const [fetchedUser, fetchedService, fetchedAppts] = await Promise.all([
+      const [fetchedUser, fetchedServices, fetchedAppts] = await Promise.all([
         api.getUser(),
-        api.getSareeService(),
+        api.getSareeServices(),
         api.getSareeAppointments()
       ]);
       setUser(fetchedUser);
-      setSareeService(fetchedService);
+      setSareeServices(fetchedServices);
       setSareeAppointments(fetchedAppts);
     };
     initData();
@@ -66,9 +69,19 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   // Service Management
+  const addSareeService = async (service: SareeService) => {
+    const newService = await api.addSareeService(service);
+    setSareeServices(prev => [...prev, newService]);
+  };
+
   const updateSareeServiceState = async (data: SareeService) => {
     await api.updateSareeService(data);
-    setSareeService(data);
+    setSareeServices(prev => prev.map(s => s.id === data.id ? data : s));
+  };
+
+  const deleteSareeService = async (id: string) => {
+    await api.deleteSareeService(id);
+    setSareeServices(prev => prev.filter(s => s.id !== id));
   };
 
   // Appointment Management
@@ -92,8 +105,10 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         user,
         login,
         logout,
-        sareeService,
+        sareeServices,
+        addSareeService,
         updateSareeService: updateSareeServiceState,
+        deleteSareeService,
         sareeAppointments,
         bookSareeAppointment,
         updateSareeAppointment,
@@ -109,6 +124,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         updateOrderStatus: async () => {},
         addProduct: () => {},
         deleteProduct: () => {},
+        submitPreBuiltOrder: async () => true,
       }}
     >
       {children}
