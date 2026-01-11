@@ -27,7 +27,7 @@ export const api = {
   // --- Backup/Restore ---
   downloadBackup: () => {
     const data = {
-      sareeServices: load('ruchira_services_list_v3', DEFAULT_SAREE_SERVICES),
+      sareeServices: load('ruchira_services_list_v6', DEFAULT_SAREE_SERVICES),
       sareeAppointments: load('ruchira_appointments_v2', []),
       timestamp: new Date().toISOString(),
     };
@@ -42,14 +42,14 @@ export const api = {
   // --- SERVICE MANAGEMENT (CRUD) ---
   getSareeServices: async (): Promise<SareeService[]> => {
     if (isBackendLive()) return http<SareeService[]>('/services');
-    return load<SareeService[]>('ruchira_services_list_v3', DEFAULT_SAREE_SERVICES);
+    return load<SareeService[]>('ruchira_services_list_v6', DEFAULT_SAREE_SERVICES);
   },
 
   addSareeService: async (service: SareeService): Promise<SareeService> => {
     if (isBackendLive()) return http<SareeService>('/services', { method: 'POST', body: JSON.stringify(service) });
-    const services = load<SareeService[]>('ruchira_services_list_v3', DEFAULT_SAREE_SERVICES);
+    const services = load<SareeService[]>('ruchira_services_list_v6', DEFAULT_SAREE_SERVICES);
     const newServices = [...services, service];
-    save('ruchira_services_list_v3', newServices);
+    save('ruchira_services_list_v6', newServices);
     return service;
   },
 
@@ -58,9 +58,9 @@ export const api = {
       await http(`/services/${data.id}`, { method: 'PUT', body: JSON.stringify(data) });
       return;
     }
-    const services = load<SareeService[]>('ruchira_services_list_v3', DEFAULT_SAREE_SERVICES);
+    const services = load<SareeService[]>('ruchira_services_list_v6', DEFAULT_SAREE_SERVICES);
     const updated = services.map(s => s.id === data.id ? data : s);
-    save('ruchira_services_list_v3', updated);
+    save('ruchira_services_list_v6', updated);
   },
 
   deleteSareeService: async (id: string): Promise<void> => {
@@ -68,9 +68,9 @@ export const api = {
         await http(`/services/${id}`, { method: 'DELETE' });
         return;
     }
-    const services = load<SareeService[]>('ruchira_services_list_v3', DEFAULT_SAREE_SERVICES);
+    const services = load<SareeService[]>('ruchira_services_list_v6', DEFAULT_SAREE_SERVICES);
     const filtered = services.filter(s => s.id !== id);
-    save('ruchira_services_list_v3', filtered);
+    save('ruchira_services_list_v6', filtered);
   },
 
   // --- APPOINTMENTS ---
