@@ -21,9 +21,6 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             <div className="flex space-x-8 items-center">
               <Link to="/" className={isActive('/')}>Our Service</Link>
               <Link to="/book-appointment" className="px-4 py-2 bg-rose-600 text-white rounded-md hover:bg-rose-700 transition font-medium">Book Appointment</Link>
-              {user?.role === 'admin' && (
-                <Link to="/admin" className="text-rose-700 font-semibold border border-rose-200 px-3 py-1 rounded">Admin</Link>
-              )}
             </div>
           </div>
         </div>

@@ -10,18 +10,18 @@ export const ServiceDisplay: React.FC = () => {
       {/* Hero Section */}
       <div className="relative bg-rose-900 h-80">
         <div className="absolute inset-0">
-           <div className="absolute inset-0 bg-black opacity-40"></div>
+           <div className="absolute inset-0 bg-gradient-to-r from-rose-900 via-rose-800 to-transparent opacity-90"></div>
            <img 
-            src="https://images.unsplash.com/photo-1583391733958-d023e669968e?q=80&w=2000&auto=format&fit=crop" 
+            src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=2000&auto=format&fit=crop" 
             alt="Saree Texture" 
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover mix-blend-overlay"
             onError={(e) => {
                 e.currentTarget.src = "https://placehold.co/1200x400/881337/FFFFFF?text=RuChiRa+Services";
             }}
            />
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">RuChiRa Saree Services</h1>
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-white mb-4">RuChiRa Saree Pre-pleating</h1>
             <p className="text-rose-100 text-lg max-w-2xl">
                 Expert care for your sarees. Choose a service below to book an appointment. 
                 Bring your saree, and we'll handle the rest.
@@ -74,7 +74,7 @@ export const ServiceDisplay: React.FC = () => {
                         
                         <div className="border-t pt-6 flex items-center justify-between">
                             <div>
-                                <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">Price Range</p>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest font-semibold">Pricing</p>
                                 <p className="text-xl font-bold text-rose-600">{service.price_range}</p>
                             </div>
                             
