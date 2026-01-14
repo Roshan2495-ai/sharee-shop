@@ -230,6 +230,7 @@ export const AdminDashboard: React.FC = () => {
                                     <th className="p-4">Date / Time</th>
                                     <th className="p-4">Service</th>
                                     <th className="p-4">Customer</th>
+                                    <th className="p-4">Saree</th>
                                     <th className="p-4">Status</th>
                                     <th className="p-4">Notes</th>
                                 </tr>
@@ -251,6 +252,23 @@ export const AdminDashboard: React.FC = () => {
                                         <td className="p-4">
                                             <div className="font-medium">{appt.customer_name}</div>
                                             <div className="text-xs text-gray-500">{appt.phone}</div>
+                                        </td>
+                                        <td className="p-4">
+                                            {appt.saree_image ? (
+                                                <div className="relative group w-12 h-12">
+                                                    <img 
+                                                        src={appt.saree_image} 
+                                                        alt="Saree" 
+                                                        className="w-full h-full object-cover rounded border cursor-pointer"
+                                                        onClick={() => {
+                                                            const win = window.open();
+                                                            win?.document.write('<img src="' + appt.saree_image + '" style="max-width:100%"/>');
+                                                        }}
+                                                    />
+                                                </div>
+                                            ) : (
+                                                <span className="text-xs text-gray-400 italic">No Photo</span>
+                                            )}
                                         </td>
                                         <td className="p-4">
                                             <select 
@@ -281,7 +299,7 @@ export const AdminDashboard: React.FC = () => {
                                         </td>
                                     </tr>
                                 )})}
-                                {sareeAppointments.length === 0 && <tr><td colSpan={5} className="p-8 text-center text-gray-500">No bookings found.</td></tr>}
+                                {sareeAppointments.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-gray-500">No bookings found.</td></tr>}
                             </tbody>
                         </table>
                     </div>

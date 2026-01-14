@@ -22,8 +22,25 @@ export const BookingForm: React.FC = () => {
     phone: '',
     appointment_date: '',
     appointment_time: '',
-    notes: ''
+    notes: '',
+    saree_image: ''
   });
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+          setError("File is too large. Please upload an image under 5MB.");
+          return;
+      }
+      setError(''); // Clear previous errors
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, saree_image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,6 +144,39 @@ export const BookingForm: React.FC = () => {
                             <option value="">-- Select Time --</option>
                             {TIME_SLOTS.map(t => <option key={t} value={t}>{t}</option>)}
                         </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Upload Saree Photo (Optional)</label>
+                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-rose-400 transition-colors">
+                        <div className="space-y-1 text-center">
+                            {formData.saree_image ? (
+                                <div className="relative">
+                                    <img src={formData.saree_image} alt="Preview" className="mx-auto h-48 object-contain rounded" />
+                                    <button 
+                                        type="button"
+                                        onClick={() => setFormData({...formData, saree_image: ''})}
+                                        className="absolute top-0 right-0 -mt-2 -mr-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 shadow-sm"
+                                    >
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    <div className="flex text-sm text-gray-600 justify-center">
+                                        <label htmlFor="file-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-rose-600 hover:text-rose-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-rose-500">
+                                            <span>Upload a photo</span>
+                                            <input id="file-upload" name="file-upload" type="file" className="sr-only" accept="image/*" onChange={handleImageChange} />
+                                        </label>
+                                    </div>
+                                    <p className="text-xs text-gray-500">PNG, JPG up to 5MB</p>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 

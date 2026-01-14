@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import { TIME_SLOTS } from '../constants';
 
 export const SareeAppointment: React.FC = () => {
-  const { bookSareeAppointment } = useApp();
+  const { bookSareeAppointment, sareeServices } = useApp();
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
   
@@ -22,8 +22,19 @@ export const SareeAppointment: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Attempt to map the selected pleating type to a known service ID
+    // Note: Constants use "Floppy Pleatings" (plural), Form uses "Floppy Pleating" (singular)
+    const serviceName = formData.pleating_type === 'Floppy Pleating' ? 'Floppy Pleatings' : formData.pleating_type;
+    const service = sareeServices.find(s => s.name === serviceName);
     
-    const success = await bookSareeAppointment(formData);
+    // Use the found service ID, or a fallback if something goes wrong (should be rare if data is intact)
+    const service_id = service ? service.id : 'srv-unknown';
+    
+    const success = await bookSareeAppointment({
+      ...formData,
+      service_id
+    });
     
     if (success) {
       setSubmitted(true);

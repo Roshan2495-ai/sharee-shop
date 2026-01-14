@@ -1,3 +1,4 @@
+
 export interface Product {
   id: string;
   name: string;
@@ -45,6 +46,12 @@ export interface SareeAppointment {
   admin_notes?: string;
   status: 'Booked' | 'Received' | 'In Progress' | 'Completed' | 'Delivered';
   created_at: string;
+  saree_image?: string; // Base64 string of uploaded image
+  // Extended fields
+  fabric_type?: string;
+  pleating_type?: string;
+  waist_size?: string;
+  pickup_method?: string;
 }
 
 export interface User {

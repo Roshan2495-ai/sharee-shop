@@ -10,11 +10,12 @@ export const ServiceDisplay: React.FC = () => {
       {/* Hero Section */}
       <div className="relative bg-rose-900 h-80">
         <div className="absolute inset-0">
-           <div className="absolute inset-0 bg-gradient-to-r from-rose-900 via-rose-800 to-transparent opacity-90"></div>
+           <div className="absolute inset-0 bg-gradient-to-r from-rose-900 via-rose-800 to-transparent opacity-80"></div>
+           {/* Using the Best Picture (Blue Silk) for Hero */}
            <img 
-            src="https://images.unsplash.com/photo-1605296867304-46d5465a13f1?q=80&w=2000&auto=format&fit=crop" 
-            alt="Royal Saree Texture" 
-            className="w-full h-full object-cover mix-blend-overlay"
+            src="https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=2000&auto=format&fit=crop" 
+            alt="Royal Blue Saree Texture" 
+            className="w-full h-full object-cover mix-blend-overlay opacity-90"
             onError={(e) => {
                 e.currentTarget.src = "https://placehold.co/1200x400/881337/FFFFFF?text=RuChiRa+Services";
             }}

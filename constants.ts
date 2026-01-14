@@ -5,7 +5,7 @@ export const DEFAULT_SAREE_SERVICES: SareeService[] = [
   {
     id: 'srv-fold-01',
     name: 'Box Folding',
-    // Image: Blue Silk Saree (Matching user request)
+    // Image: Neatly Box Folded Saree (Blue Silk)
     image: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?q=80&w=800&auto=format&fit=crop',
     description: 'Expert box folding service. We fold your saree into a compact, wrinkle-free shape perfect for storage or travel. Bring your saree, we fold it perfectly.',
     price_range: 'Affordable Range',
@@ -14,8 +14,8 @@ export const DEFAULT_SAREE_SERVICES: SareeService[] = [
   {
     id: 'srv-pleat-02',
     name: 'Floppy Pleatings',
-    // Image: Draped fabric with pleats
-    image: 'https://images.unsplash.com/photo-1583391733958-d023e669968e?q=80&w=800&auto=format&fit=crop',
+    // Image: Saree showing pleats and texture (Red Silk)
+    image: 'https://images.unsplash.com/photo-1595981267035-7b04ca84a82d?q=80&w=800&auto=format&fit=crop',
     description: 'Professional pre-pleating service. We create perfect, ironed pleats (patli) that make draping your saree taking only 1 minute. Ready to wear.',
     price_range: 'Affordable Range',
     status: 'Active'

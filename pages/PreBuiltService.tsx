@@ -12,7 +12,7 @@ export const PreBuiltService: React.FC = () => {
     pleatingType: 'Box Folding' as const,
     waistSize: '',
     sareeLength: '',
-    blouseAttached: 'No' as const,
+    blouseAttached: 'No' as 'Yes' | 'No',
     pickupMethod: 'Pickup' as const,
     preferredDate: '',
     notes: ''

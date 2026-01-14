@@ -32,6 +32,7 @@ interface AppContextType {
   deleteProduct: (id: string) => void;
   // Legacy PreBuilt
   submitPreBuiltOrder: (o: any) => Promise<boolean>;
+  bookAppointment: (o: any) => Promise<boolean>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -125,6 +126,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         addProduct: () => {},
         deleteProduct: () => {},
         submitPreBuiltOrder: async () => true,
+        bookAppointment: async () => true,
       }}
     >
       {children}
