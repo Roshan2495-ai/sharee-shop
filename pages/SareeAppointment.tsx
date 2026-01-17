@@ -10,12 +10,12 @@ export const SareeAppointment: React.FC = () => {
   const [formData, setFormData] = useState({
     customer_name: '',
     phone: '',
-    fabric_type: 'Silk' as const,
-    pleating_type: 'Box Folding' as const,
+    fabric_type: 'Silk',
+    pleating_type: 'Box Folding',
     waist_size: '',
     appointment_date: '',
     appointment_time: '',
-    pickup_method: 'Drop at Shop' as const,
+    pickup_method: 'Drop at Shop',
     notes: ''
   });
 
