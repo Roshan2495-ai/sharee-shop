@@ -36,6 +36,36 @@ export const api = {
     }
   },
 
+  uploadHeroBanner: async (file: File): Promise<string | null> => {
+    if (!isBackendLive()) return null;
+    try {
+        // We overwrite 'hero-banner' so the frontend always looks for this specific file.
+        // The upsert: true allows overwriting.
+        const { error: uploadError } = await supabase.storage
+            .from('hero-banners')
+            .upload('hero-banner', file, { upsert: true });
+
+        if (uploadError) {
+            console.error('Error uploading banner:', uploadError);
+            return null;
+        }
+
+        const { data } = supabase.storage.from('hero-banners').getPublicUrl('hero-banner');
+        // We append a timestamp to the return value to help the UI clear cache, 
+        // though the getHeroBannerUrl function below is the main accessor.
+        return `${data.publicUrl}?t=${Date.now()}`;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+  },
+
+  getHeroBannerUrl: (): string | null => {
+      if (!isBackendLive()) return null;
+      const { data } = supabase.storage.from('hero-banners').getPublicUrl('hero-banner');
+      return data.publicUrl;
+  },
+
   // --- Backup/Restore ---
   downloadBackup: async () => {
     const services = await api.getSareeServices();
@@ -50,7 +80,7 @@ export const api = {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `ruchira_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.download = `ruchiraa_backup_${new Date().toISOString().slice(0,10)}.json`;
     a.click();
   },
 
@@ -200,20 +230,20 @@ export const api = {
   // --- AUTH (Session Management) ---
   // We keep the login session local (per device), but the Data is Global (Supabase).
   login: async (email: string): Promise<User | null> => {
-    if (email === 'admin@ruchira.com') {
+    if (email === 'admin@ruchiraa.com') {
       const user: User = { id: 'u1', email, role: 'admin', name: 'Admin User' };
-      localStorage.setItem('ruchira_user', JSON.stringify(user));
+      localStorage.setItem('ruchiraa_user', JSON.stringify(user));
       return user;
     }
     return null;
   },
 
   logout: async () => {
-    localStorage.removeItem('ruchira_user');
+    localStorage.removeItem('ruchiraa_user');
   },
 
   getUser: async (): Promise<User | null> => {
-    const data = localStorage.getItem('ruchira_user');
+    const data = localStorage.getItem('ruchiraa_user');
     return data ? JSON.parse(data) : null;
   },
 

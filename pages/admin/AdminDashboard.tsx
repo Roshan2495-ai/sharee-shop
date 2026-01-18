@@ -11,13 +11,14 @@ export const AdminDashboard: React.FC = () => {
     sareeAppointments, updateSareeAppointment
   } = useApp();
   
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'services' | 'appointments'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'services' | 'appointments' | 'settings'>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   // State for adding/editing service
   const [isEditing, setIsEditing] = useState(false);
   const [currentService, setCurrentService] = useState<SareeService | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [bannerUploadStatus, setBannerUploadStatus] = useState('');
 
   // Form Initial State
   const initialServiceForm: SareeService = {
@@ -82,6 +83,20 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          setBannerUploadStatus('Uploading...');
+          const url = await api.uploadHeroBanner(e.target.files[0]);
+          if (url) {
+              setBannerUploadStatus('✅ Banner Updated Successfully!');
+              // Clear message after 3 seconds
+              setTimeout(() => setBannerUploadStatus(''), 3000);
+          } else {
+              setBannerUploadStatus('❌ Failed to upload. Check connection.');
+          }
+      }
+  };
+
   // --- Stats ---
   const stats = [
     { name: 'Active Services', value: sareeServices.filter(s => s.status === 'Active').length },
@@ -105,7 +120,7 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Mobile Header */}
       <div className="md:hidden bg-gray-900 text-white p-4 flex justify-between items-center shadow-md">
-        <span className="font-serif font-bold text-xl text-rose-500">RuChiRa Admin</span>
+        <span className="font-serif font-bold text-xl text-rose-500">RuChiRaa Admin</span>
         <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-1 border border-gray-700 rounded hover:bg-gray-800">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
         </button>
@@ -117,6 +132,7 @@ export const AdminDashboard: React.FC = () => {
             <button onClick={() => handleMobileNav('dashboard')} className={`block w-full text-left px-6 py-3 border-b border-gray-700 ${activeTab === 'dashboard' ? 'bg-rose-900' : ''}`}>Dashboard</button>
             <button onClick={() => handleMobileNav('services')} className={`block w-full text-left px-6 py-3 border-b border-gray-700 ${activeTab === 'services' ? 'bg-rose-900' : ''}`}>Services</button>
             <button onClick={() => handleMobileNav('appointments')} className={`block w-full text-left px-6 py-3 border-b border-gray-700 ${activeTab === 'appointments' ? 'bg-rose-900' : ''}`}>Appointments</button>
+            <button onClick={() => handleMobileNav('settings')} className={`block w-full text-left px-6 py-3 border-b border-gray-700 ${activeTab === 'settings' ? 'bg-rose-900' : ''}`}>Site Settings</button>
             <button onClick={logout} className="block w-full text-left px-6 py-3 text-red-300">Logout</button>
           </div>
       )}
@@ -124,11 +140,12 @@ export const AdminDashboard: React.FC = () => {
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar */}
         <aside className="w-64 bg-gray-900 text-white flex-shrink-0 hidden md:block">
-            <div className="p-6 text-2xl font-serif font-bold text-rose-500">RuChiRa Admin</div>
+            <div className="p-6 text-2xl font-serif font-bold text-rose-500">RuChiRaa Admin</div>
             <nav className="mt-6 px-4 space-y-2">
                 <button onClick={() => {setActiveTab('dashboard'); setIsEditing(false);}} className={`block w-full text-left px-4 py-3 rounded ${activeTab === 'dashboard' ? 'bg-rose-600' : 'hover:bg-gray-800'}`}>Dashboard</button>
                 <button onClick={() => {setActiveTab('services'); setIsEditing(false);}} className={`block w-full text-left px-4 py-3 rounded ${activeTab === 'services' ? 'bg-rose-600' : 'hover:bg-gray-800'}`}>Service Management</button>
                 <button onClick={() => {setActiveTab('appointments'); setIsEditing(false);}} className={`block w-full text-left px-4 py-3 rounded ${activeTab === 'appointments' ? 'bg-rose-600' : 'hover:bg-gray-800'}`}>Appointments</button>
+                <button onClick={() => {setActiveTab('settings'); setIsEditing(false);}} className={`block w-full text-left px-4 py-3 rounded ${activeTab === 'settings' ? 'bg-rose-600' : 'hover:bg-gray-800'}`}>Site Settings</button>
                 <button onClick={() => api.downloadBackup()} className="block w-full text-left px-4 py-3 rounded text-blue-400 hover:bg-gray-800 mt-8">Backup Data</button>
                 <button onClick={logout} className="block w-full text-left px-4 py-3 rounded text-red-400 hover:bg-gray-800 mt-2">Logout</button>
             </nav>
@@ -305,6 +322,34 @@ export const AdminDashboard: React.FC = () => {
                             </button>
                         </div>
                     </form>
+                </div>
+            )}
+            
+            {activeTab === 'settings' && (
+                <div className="bg-white rounded-lg shadow p-6 md:p-8">
+                    <h2 className="text-2xl font-bold mb-6">Site Settings</h2>
+                    
+                    <div className="mb-8">
+                        <h3 className="text-lg font-semibold mb-2">Homepage Hero Banner</h3>
+                        <p className="text-sm text-gray-500 mb-4">Upload a new image to replace the main banner on the homepage. Recommended size: 2000x800px.</p>
+                        
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center px-4 py-2 bg-rose-600 text-white rounded cursor-pointer hover:bg-rose-700 transition">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                Upload Banner
+                                <input type="file" className="hidden" accept="image/*" onChange={handleBannerUpload} />
+                            </label>
+                            {bannerUploadStatus && (
+                                <span className={`text-sm font-medium ${bannerUploadStatus.includes('Success') ? 'text-green-600' : bannerUploadStatus.includes('Fail') ? 'text-red-600' : 'text-gray-600'}`}>
+                                    {bannerUploadStatus}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
+                        <p><strong>Note:</strong> Changes to the hero banner may take a few moments to reflect on the main site due to caching.</p>
+                    </div>
                 </div>
             )}
 

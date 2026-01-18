@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { TIME_SLOTS } from '../constants';
 import { useNavigate, useParams } from 'react-router-dom';
-import { api } from '../services/api';
+import { api, isBackendLive } from '../services/api';
 
 export const BookingForm: React.FC = () => {
   const { bookSareeAppointment, sareeServices } = useApp();
@@ -13,10 +13,21 @@ export const BookingForm: React.FC = () => {
   const [success, setSuccess] = useState(false);
   const [selectedService, setSelectedService] = useState(sareeServices.find(s => s.id === serviceId));
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [heroBanner, setHeroBanner] = useState<string | null>(null);
+
+  // Fallback image
+  const defaultBanner = "https://images.unsplash.com/photo-1596704017254-9b121068fb31?q=80&w=2000&auto=format&fit=crop";
 
   useEffect(() => {
     // If services load async or URL param changes
     setSelectedService(sareeServices.find(s => s.id === serviceId));
+
+    if (isBackendLive()) {
+        const banner = api.getHeroBannerUrl();
+        if (banner) {
+            setHeroBanner(`${banner}?t=${Date.now()}`); 
+        }
+    }
   }, [sareeServices, serviceId]);
   
   const [formData, setFormData] = useState({
@@ -103,12 +114,17 @@ export const BookingForm: React.FC = () => {
         </div>
 
         <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
-            {/* Best Banner Image: High quality Kanjivaram/Silk texture */}
+            {/* Banner Image */}
             <div className="h-48 w-full relative">
                 <img 
-                    src="https://images.unsplash.com/photo-1610030469668-9653612d6a50?q=80&w=2000&auto=format&fit=crop" 
+                    src={heroBanner || defaultBanner} 
                     alt="Royal Saree Banner" 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                        if (e.currentTarget.src !== defaultBanner) {
+                            e.currentTarget.src = defaultBanner;
+                        }
+                    }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent flex items-end">
                     <div className="p-6 w-full flex justify-between items-end">

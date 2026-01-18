@@ -1,9 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
+import { api, isBackendLive } from '../services/api';
 
 export const ServiceDisplay: React.FC = () => {
   const { sareeServices } = useApp();
+  const [heroBanner, setHeroBanner] = useState<string | null>(null);
+
+  // Fallback image (High Quality Traditional Saree/Bridal Background)
+  const defaultBanner = "https://images.unsplash.com/photo-1596704017254-9b121068fb31?q=80&w=2000&auto=format&fit=crop";
+
+  useEffect(() => {
+    if (isBackendLive()) {
+      const banner = api.getHeroBannerUrl();
+      if (banner) {
+         // Append timestamp to avoid caching issues when admin updates the banner
+         setHeroBanner(`${banner}?t=${Date.now()}`); 
+      }
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-rose-50/50">
@@ -12,13 +27,16 @@ export const ServiceDisplay: React.FC = () => {
         <div className="absolute inset-0">
            {/* Darker gradient overlay for better text readability */}
            <div className="absolute inset-0 bg-gradient-to-r from-rose-950 via-rose-900/80 to-rose-900/40 opacity-90 z-10"></div>
-           {/* High Quality Traditional Saree Background - Vibrant & Premium */}
+           
            <img 
-            src="https://images.unsplash.com/photo-1610030469668-9653612d6a50?q=80&w=2000&auto=format&fit=crop" 
-            alt="Royal Saree Texture" 
-            className="w-full h-full object-cover object-top"
+            src={heroBanner || defaultBanner} 
+            alt="RuChiRaa Banner" 
+            className="w-full h-full object-cover object-top transition-opacity duration-500"
             onError={(e) => {
-                e.currentTarget.src = "https://placehold.co/1200x400/881337/FFFFFF?text=RuChiRa+Services";
+                // If custom banner fails to load (e.g. 404), fallback to default
+                if (e.currentTarget.src !== defaultBanner) {
+                    e.currentTarget.src = defaultBanner;
+                }
             }}
            />
         </div>

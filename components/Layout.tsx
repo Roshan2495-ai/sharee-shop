@@ -16,7 +16,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex justify-between h-20 items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-rose-700">RuChiRa</span>
+              <span className="text-2xl sm:text-3xl font-serif font-bold text-rose-700">RuChiRaa</span>
               <span className="hidden sm:inline-block text-sm uppercase tracking-widest text-gray-500 mt-2">Services</span>
             </Link>
             
@@ -81,7 +81,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       <footer className="bg-rose-900 text-rose-100 py-12">
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div>
-            <h3 className="text-2xl font-serif font-bold mb-4">RuChiRa</h3>
+            <h3 className="text-2xl font-serif font-bold mb-1">RuChiRaa</h3>
+            <p className="text-rose-300 text-sm mb-4 font-medium italic">By Sonali Maharana</p>
             <p className="text-rose-200">
               Expert saree folding and pleating services. Bring your saree, we do the rest.
             </p>
@@ -95,12 +96,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
           <div>
             <h4 className="text-lg font-bold mb-4 text-white">Contact</h4>
-            <p>123 Fashion City, NY</p>
-            <p>hello@ruchira.com</p>
+            <p>Jharagogua, Deogarh, Odisha, India</p>
+            <p>hello@ruchiraa.com</p>
           </div>
         </div>
         <div className="text-center mt-12 border-t border-rose-800 pt-8 text-sm text-rose-300">
-          © {new Date().getFullYear()} RuChiRa. All rights reserved.
+          © {new Date().getFullYear()} RuChiRaa. All rights reserved.
         </div>
       </footer>
     </div>

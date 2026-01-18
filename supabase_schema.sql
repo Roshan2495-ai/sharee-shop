@@ -61,8 +61,6 @@ values ('saree-images', 'saree-images', true)
 on conflict (id) do nothing;
 
 -- 8. STORAGE POLICIES (Allow Public Read/Write)
--- Note: In a stricter app, you would limit 'insert' to authenticated users, 
--- but for a public booking form, we allow public uploads.
 
 -- Allow Public View (Select)
 drop policy if exists "Public Access Saree Images" on storage.objects;
@@ -76,7 +74,7 @@ create policy "Public Upload Saree Images"
   on storage.objects for insert
   with check ( bucket_id = 'saree-images' );
 
--- Allow Public Update/Delete (Optional, primarily for Admin dashboard)
+-- Allow Public Update/Delete
 drop policy if exists "Public Update Saree Images" on storage.objects;
 create policy "Public Update Saree Images"
   on storage.objects for update
@@ -86,3 +84,26 @@ drop policy if exists "Public Delete Saree Images" on storage.objects;
 create policy "Public Delete Saree Images"
   on storage.objects for delete
   using ( bucket_id = 'saree-images' );
+
+-- ==========================================
+-- 9. HERO BANNER BUCKET
+-- ==========================================
+
+insert into storage.buckets (id, name, public)
+values ('hero-banners', 'hero-banners', true)
+on conflict (id) do nothing;
+
+drop policy if exists "Public Access Hero Banners" on storage.objects;
+create policy "Public Access Hero Banners"
+  on storage.objects for select
+  using ( bucket_id = 'hero-banners' );
+
+drop policy if exists "Public Upload Hero Banners" on storage.objects;
+create policy "Public Upload Hero Banners"
+  on storage.objects for insert
+  with check ( bucket_id = 'hero-banners' );
+  
+drop policy if exists "Public Update Hero Banners" on storage.objects;
+create policy "Public Update Hero Banners"
+  on storage.objects for update
+  using ( bucket_id = 'hero-banners' );

@@ -11,11 +11,11 @@ export const AdminLogin: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'admin@ruchira.com' && password === 'admin123') {
+    if (email === 'admin@ruchiraa.com' && password === 'admin123') {
       login(email, 'admin');
       navigate('/admin');
     } else {
-      setError('Invalid credentials (Try: admin@ruchira.com / admin123)');
+      setError('Invalid credentials (Try: admin@ruchiraa.com / admin123)');
     }
   };
 
@@ -35,7 +35,7 @@ export const AdminLogin: React.FC = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-rose-500 focus:border-rose-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@ruchira.com"
+              placeholder="admin@ruchiraa.com"
             />
           </div>
           <div>

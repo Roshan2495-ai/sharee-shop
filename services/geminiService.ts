@@ -17,7 +17,7 @@ export const getAIRecommendation = async (userQuery: string): Promise<string> =>
 
     try {
         const model = 'gemini-3-flash-preview';
-        const systemInstruction = `You are a sophisticated and helpful Virtual Stylist for "RuChiRa". 
+        const systemInstruction = `You are a sophisticated and helpful Virtual Stylist for "RuChiRaa". 
         Your goal is to recommend Sarees based on the user's request. 
         Keep your tone elegant, warm, and professional. 
         If the user asks about Sarees, suggest types like Banarasi, Kanjivaram, Chiffon based on occasion.
