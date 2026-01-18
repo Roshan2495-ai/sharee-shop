@@ -21,7 +21,7 @@ export const AIStylist: React.FC<Props> = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white w-80 md:w-96 rounded-2xl shadow-2xl border border-rose-100 overflow-hidden flex flex-col">
+    <div className="bg-white w-[90vw] sm:w-80 md:w-96 rounded-2xl shadow-2xl border border-rose-100 overflow-hidden flex flex-col mx-auto mb-4 md:mb-0">
       <div className="bg-gradient-to-r from-rose-500 to-rose-600 p-4 flex justify-between items-center text-white">
         <h3 className="font-serif font-bold flex items-center gap-2">
           ✨ Virtual Stylist

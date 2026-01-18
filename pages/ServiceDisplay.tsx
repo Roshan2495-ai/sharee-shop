@@ -14,7 +14,7 @@ export const ServiceDisplay: React.FC = () => {
            <div className="absolute inset-0 bg-gradient-to-r from-rose-950 via-rose-900/80 to-rose-900/40 opacity-90 z-10"></div>
            {/* High Quality Traditional Saree Background - Vibrant & Premium */}
            <img 
-            src="https://images.unsplash.com/photo-1576174464184-fb78fe882bfd?q=80&w=2000&auto=format&fit=crop" 
+            src="https://images.unsplash.com/photo-1610030469668-9653612d6a50?q=80&w=2000&auto=format&fit=crop" 
             alt="Royal Saree Texture" 
             className="w-full h-full object-cover object-top"
             onError={(e) => {
@@ -23,11 +23,11 @@ export const ServiceDisplay: React.FC = () => {
            />
         </div>
         <div className="relative z-20 max-w-7xl mx-auto px-4 h-full flex flex-col justify-center items-start text-left">
-            <h1 className="text-5xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-md">
+            <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-6 leading-tight drop-shadow-md">
               Perfect Pleats, <br/>
               <span className="text-rose-200">Effortless Drapes</span>
             </h1>
-            <p className="text-rose-50 text-xl max-w-2xl mb-8 leading-relaxed drop-shadow">
+            <p className="text-rose-50 text-lg md:text-xl max-w-2xl mb-8 leading-relaxed drop-shadow">
                 Experience the art of saree pre-pleating. We fold and pleat your sarees to perfection, 
                 so you can drape them in under a minute.
             </p>
@@ -54,7 +54,7 @@ export const ServiceDisplay: React.FC = () => {
             
             {sareeServices.map((service) => (
                 <div key={service.id} className="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col hover:shadow-2xl transition-shadow duration-300 border border-rose-100 group">
-                    <div className="h-72 overflow-hidden relative bg-gray-100">
+                    <div className="h-64 md:h-72 overflow-hidden relative bg-gray-100">
                         {service.image ? (
                             <img 
                                 src={service.image} 
@@ -83,11 +83,11 @@ export const ServiceDisplay: React.FC = () => {
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
                     
-                    <div className="p-8 flex-grow flex flex-col relative">
-                        <h2 className="text-3xl font-serif font-bold text-gray-900 mb-3 group-hover:text-rose-700 transition-colors">{service.name}</h2>
+                    <div className="p-6 md:p-8 flex-grow flex flex-col relative">
+                        <h2 className="text-2xl md:text-3xl font-serif font-bold text-gray-900 mb-3 group-hover:text-rose-700 transition-colors">{service.name}</h2>
                         <p className="text-gray-600 mb-6 flex-grow leading-relaxed">{service.description}</p>
                         
-                        <div className="border-t border-gray-100 pt-6 flex items-center justify-between">
+                        <div className="border-t border-gray-100 pt-6 flex flex-wrap items-center justify-between gap-4">
                             <div>
                                 <p className="text-xs text-gray-400 uppercase tracking-widest font-semibold mb-1">Service Cost</p>
                                 <p className="text-xl font-bold text-rose-600">{service.price_range}</p>
@@ -96,12 +96,12 @@ export const ServiceDisplay: React.FC = () => {
                             {service.status === 'Active' ? (
                                 <Link 
                                     to={`/book-appointment/${service.id}`}
-                                    className="bg-rose-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-rose-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+                                    className="bg-rose-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-rose-700 transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 w-full md:w-auto text-center"
                                 >
                                     Book Now
                                 </Link>
                             ) : (
-                                <button disabled className="bg-gray-200 text-gray-400 px-6 py-3 rounded-lg font-bold cursor-not-allowed">
+                                <button disabled className="bg-gray-200 text-gray-400 px-6 py-3 rounded-lg font-bold cursor-not-allowed w-full md:w-auto">
                                     Unavailable
                                 </button>
                             )}

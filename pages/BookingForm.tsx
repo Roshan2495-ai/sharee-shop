@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { TIME_SLOTS } from '../constants';
 import { useNavigate, useParams } from 'react-router-dom';
+import { api } from '../services/api';
 
 export const BookingForm: React.FC = () => {
   const { bookSareeAppointment, sareeServices } = useApp();
@@ -11,6 +12,7 @@ export const BookingForm: React.FC = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [selectedService, setSelectedService] = useState(sareeServices.find(s => s.id === serviceId));
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     // If services load async or URL param changes
@@ -34,16 +36,22 @@ export const BookingForm: React.FC = () => {
         return;
     }
 
+    setIsSubmitting(true);
+
     const isSuccess = await bookSareeAppointment({
         service_id: selectedService.id,
-        ...formData
+        ...formData,
+        // Image upload removed as per requirement
     });
+
+    setIsSubmitting(false);
 
     if (isSuccess) {
         setSuccess(true);
         window.scrollTo(0,0);
     } else {
-        setError('The selected time slot is already booked for this service. Please choose another.');
+        // Generic error message to handle various failure modes (network, schema, etc.)
+        setError('Unable to confirm booking. Please try again or contact support.');
     }
   };
 
@@ -142,6 +150,8 @@ export const BookingForm: React.FC = () => {
                     </div>
                 </div>
 
+                {/* Image Upload removed */}
+
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Notes (Optional)</label>
                     <textarea rows={3} className="w-full border-gray-300 rounded-md shadow-sm p-3 border focus:ring-rose-500 focus:border-rose-500"
@@ -155,8 +165,12 @@ export const BookingForm: React.FC = () => {
                     </div>
                 )}
 
-                <button type="submit" className="w-full bg-rose-600 text-white font-bold py-4 rounded-lg hover:bg-rose-700 transition shadow-lg">
-                    Confirm Appointment
+                <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className={`w-full text-white font-bold py-4 rounded-lg transition shadow-lg flex justify-center items-center ${isSubmitting ? 'bg-rose-400 cursor-wait' : 'bg-rose-600 hover:bg-rose-700'}`}
+                >
+                    {isSubmitting ? 'Processing...' : 'Confirm Appointment'}
                 </button>
             </form>
         </div>

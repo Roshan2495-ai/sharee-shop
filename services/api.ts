@@ -1,34 +1,49 @@
-import { Product, Service, Order, Appointment, User, PreBuiltOrder, SareeAppointment, SareeService } from '../types';
-import { DEFAULT_SAREE_SERVICES, MOCK_PRODUCTS } from '../constants';
+import { User, SareeAppointment, SareeService } from '../types';
+import { supabase, supabaseUrl } from './supabaseClient';
+import { DEFAULT_SAREE_SERVICES } from '../constants';
 
-const API_BASE_URL = ""; 
-
-export const isBackendLive = () => !!API_BASE_URL;
-
-const load = <T>(key: string, fallback: T): T => {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : fallback;
-};
-
-const save = (key: string, data: any) => {
-  localStorage.setItem(key, JSON.stringify(data));
-};
-
-const http = async <T>(path: string, options?: RequestInit): Promise<T> => {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-        headers: { 'Content-Type': 'application/json', ...options?.headers },
-        ...options,
-    });
-    if (!response.ok) throw new Error('API Request Failed');
-    return response.json();
+// Helper to check if Supabase is configured
+export const isBackendLive = () => {
+    // Check if variables exist and are not the default placeholders
+    // We use the exported supabaseUrl which includes the fallback logic
+    return supabaseUrl && !supabaseUrl.includes('your-project-id') && !supabaseUrl.includes('placeholder');
 };
 
 export const api = {
+  // --- STORAGE ---
+  uploadSareeImage: async (file: File): Promise<string | null> => {
+    if (!isBackendLive()) return null;
+
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+        .from('saree-images')
+        .upload(filePath, file);
+
+        if (uploadError) {
+            console.error('Error uploading image:', uploadError);
+            return null;
+        }
+
+        const { data } = supabase.storage.from('saree-images').getPublicUrl(filePath);
+        return data.publicUrl;
+    } catch (error) {
+        console.error("Upload exception:", error);
+        return null;
+    }
+  },
+
   // --- Backup/Restore ---
-  downloadBackup: () => {
+  downloadBackup: async () => {
+    const services = await api.getSareeServices();
+    const appointments = await api.getSareeAppointments();
+    
     const data = {
-      sareeServices: load('ruchira_services_list_v8', DEFAULT_SAREE_SERVICES),
-      sareeAppointments: load('ruchira_appointments_v2', []),
+      sareeServices: services,
+      sareeAppointments: appointments,
       timestamp: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -39,94 +54,151 @@ export const api = {
     a.click();
   },
 
-  // --- SERVICE MANAGEMENT (CRUD) ---
+  // --- SERVICE MANAGEMENT ---
   getSareeServices: async (): Promise<SareeService[]> => {
-    if (isBackendLive()) return http<SareeService[]>('/services');
-    return load<SareeService[]>('ruchira_services_list_v8', DEFAULT_SAREE_SERVICES);
+    if (!isBackendLive()) {
+        console.warn("⚠️ Supabase not connected. Using fallback data.");
+        return DEFAULT_SAREE_SERVICES;
+    }
+
+    const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .order('created_at', { ascending: true });
+    
+    if (error) {
+        console.error("Supabase Error (Services):", error.message);
+        return DEFAULT_SAREE_SERVICES;
+    }
+    
+    // If table exists but is empty, return empty array to UI
+    return (data as SareeService[]) || [];
   },
 
   addSareeService: async (service: SareeService): Promise<SareeService> => {
-    if (isBackendLive()) return http<SareeService>('/services', { method: 'POST', body: JSON.stringify(service) });
-    const services = load<SareeService[]>('ruchira_services_list_v8', DEFAULT_SAREE_SERVICES);
-    const newServices = [...services, service];
-    save('ruchira_services_list_v8', newServices);
-    return service;
+    if (!isBackendLive()) throw new Error("Database not connected");
+
+    const { data, error } = await supabase
+        .from('services')
+        .insert([service])
+        .select()
+        .single();
+    
+    if (error) {
+        console.error("Error creating service:", error);
+        throw error;
+    }
+    return data;
   },
 
   updateSareeService: async (data: SareeService): Promise<void> => {
-    if (isBackendLive()) {
-      await http(`/services/${data.id}`, { method: 'PUT', body: JSON.stringify(data) });
-      return;
-    }
-    const services = load<SareeService[]>('ruchira_services_list_v8', DEFAULT_SAREE_SERVICES);
-    const updated = services.map(s => s.id === data.id ? data : s);
-    save('ruchira_services_list_v8', updated);
+    if (!isBackendLive()) return;
+
+    const { error } = await supabase
+        .from('services')
+        .update(data)
+        .eq('id', data.id);
+    
+    if (error) console.error("Error updating service:", error);
   },
 
   deleteSareeService: async (id: string): Promise<void> => {
-    if (isBackendLive()) {
-        await http(`/services/${id}`, { method: 'DELETE' });
-        return;
-    }
-    const services = load<SareeService[]>('ruchira_services_list_v8', DEFAULT_SAREE_SERVICES);
-    const filtered = services.filter(s => s.id !== id);
-    save('ruchira_services_list_v8', filtered);
+    if (!isBackendLive()) return;
+
+    const { error } = await supabase
+        .from('services')
+        .delete()
+        .eq('id', id);
+
+    if (error) console.error("Error deleting service:", error);
   },
 
-  // --- APPOINTMENTS ---
+  // --- APPOINTMENTS (The Core "Order" System) ---
   getSareeAppointments: async (): Promise<SareeAppointment[]> => {
-    if (isBackendLive()) return http<SareeAppointment[]>('/appointments');
-    return load<SareeAppointment[]>('ruchira_appointments_v2', []);
+    if (!isBackendLive()) return [];
+
+    const { data, error } = await supabase
+        .from('appointments')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+    if (error) {
+        console.error("Supabase Error (Appointments):", error.message);
+        return [];
+    }
+    return (data as SareeAppointment[]) || [];
   },
 
   createSareeAppointment: async (data: Omit<SareeAppointment, 'id' | 'status' | 'created_at'>): Promise<SareeAppointment | null> => {
-    if (isBackendLive()) {
-      return http<SareeAppointment>('/appointments', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
+    if (!isBackendLive()) {
+        console.error("Database Connection Missing");
+        return null;
     }
 
-    const appointments = load<SareeAppointment[]>('ruchira_appointments_v2', []);
-    
-    // Double Booking Check: Same Service, Same Date, Same Time
-    const activeStatuses = ['Booked', 'Received', 'In Progress', 'Completed', 'Delivered'];
-    
-    const isDoubleBooked = appointments.some(appt => 
-      appt.service_id === data.service_id &&
-      appt.appointment_date === data.appointment_date && 
-      appt.appointment_time === data.appointment_time &&
-      activeStatuses.includes(appt.status) // If status is any active status, it's booked.
-    );
+    // Capacity Check Removed: We allow unlimited bookings per slot.
 
-    if (isDoubleBooked) {
-      console.warn("Booking Failed: Slot taken for this service.");
-      return null;
-    }
-
-    const newAppt: SareeAppointment = {
+    // Create Appointment Object
+    const newAppt = {
       ...data,
-      id: `sa-${Date.now()}`,
+      id: `sa-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       status: 'Booked',
       created_at: new Date().toISOString()
     };
+
+    // First attempt: Try to insert the full object (including image if it exists)
+    const { data: inserted, error: insertError } = await supabase
+        .from('appointments')
+        .insert([newAppt])
+        .select()
+        .single();
     
-    save('ruchira_appointments_v2', [newAppt, ...appointments]);
-    return newAppt;
+    if (insertError) {
+        console.warn("Initial booking failed. This might be due to a schema mismatch (e.g., missing saree_image column). Retrying with minimal data...", insertError);
+        
+        // Fallback Strategy: If the user hasn't updated their DB schema to include 'saree_image' or other new fields,
+        // we try to insert a minimal record so the booking still succeeds.
+        const minimalAppt = {
+            id: newAppt.id,
+            service_id: newAppt.service_id,
+            customer_name: newAppt.customer_name,
+            phone: newAppt.phone,
+            appointment_date: newAppt.appointment_date,
+            appointment_time: newAppt.appointment_time,
+            status: newAppt.status,
+            created_at: newAppt.created_at,
+            notes: newAppt.notes || ''
+        };
+
+        const { data: retryData, error: retryError } = await supabase
+            .from('appointments')
+            .insert([minimalAppt])
+            .select()
+            .single();
+
+        if (retryError) {
+             console.error("Retry booking failed:", retryError);
+             return null;
+        }
+        
+        return retryData as SareeAppointment;
+    }
+
+    return inserted as SareeAppointment;
   },
 
   updateSareeAppointment: async (id: string, updates: Partial<SareeAppointment>): Promise<void> => {
-    if (isBackendLive()) {
-      await http(`/appointments/${id}`, { method: 'PATCH', body: JSON.stringify(updates) });
-      return;
-    }
+    if (!isBackendLive()) return;
 
-    const appointments = load<SareeAppointment[]>('ruchira_appointments_v2', []);
-    const updatedList = appointments.map(a => a.id === id ? { ...a, ...updates } : a);
-    save('ruchira_appointments_v2', updatedList);
+    const { error } = await supabase
+        .from('appointments')
+        .update(updates)
+        .eq('id', id);
+
+    if (error) console.error("Error updating appointment status:", error);
   },
 
-  // --- Auth ---
+  // --- AUTH (Session Management) ---
+  // We keep the login session local (per device), but the Data is Global (Supabase).
   login: async (email: string): Promise<User | null> => {
     if (email === 'admin@ruchira.com') {
       const user: User = { id: 'u1', email, role: 'admin', name: 'Admin User' };
@@ -141,10 +213,11 @@ export const api = {
   },
 
   getUser: async (): Promise<User | null> => {
-    return load<User | null>('ruchira_user', null);
+    const data = localStorage.getItem('ruchira_user');
+    return data ? JSON.parse(data) : null;
   },
 
-  // --- Legacy Stubs ---
+  // --- Legacy Stubs (Unused) ---
   getProducts: async () => [],
   getServices: async () => [],
   getOrders: async () => [],
