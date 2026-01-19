@@ -82,22 +82,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           <div>
             <h3 className="text-2xl font-serif font-bold mb-1">RuChiRaa</h3>
-            <p className="text-rose-300 text-sm mb-4 font-medium italic">By Sonali Maharana</p>
-            <p className="text-rose-200">
-              Expert saree folding and pleating services. Bring your saree, we do the rest.
-            </p>
+            <p className="text-rose-300 text-2xl font-medium italic mt-2">By Sonali Maharana</p>
           </div>
           <div>
             <h4 className="text-lg font-bold mb-4 text-white">Links</h4>
             <ul className="space-y-2">
               <li><Link to="/book-appointment/srv-fold-01" className="hover:text-white">Book Now</Link></li>
-              <li><Link to="/admin/login" className="hover:text-white">Admin Login</Link></li>
+              <li><Link to="/admin/login" className="hover:text-white">Ruchiraa</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-bold mb-4 text-white">Contact</h4>
-            <p>Jharagogua, Deogarh, Odisha, India</p>
-            <p>hello@ruchiraa.com</p>
+            <div className="text-xl space-y-1">
+              <p>Jharagogua, Deogarh, Odisha, India</p>
+              <p>ruchiraaofficial@gmail.com</p>
+            </div>
           </div>
         </div>
         <div className="text-center mt-12 border-t border-rose-800 pt-8 text-sm text-rose-300">

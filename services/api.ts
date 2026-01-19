@@ -230,7 +230,7 @@ export const api = {
   // --- AUTH (Session Management) ---
   // We keep the login session local (per device), but the Data is Global (Supabase).
   login: async (email: string): Promise<User | null> => {
-    if (email === 'admin@ruchiraa.com') {
+    if (email === 'ruchiraaofficial@gmail.com' || email === 'admin@ruchiraa.com') {
       const user: User = { id: 'u1', email, role: 'admin', name: 'Admin User' };
       localStorage.setItem('ruchiraa_user', JSON.stringify(user));
       return user;

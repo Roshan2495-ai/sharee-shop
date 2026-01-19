@@ -11,11 +11,11 @@ export const AdminLogin: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === 'admin@ruchiraa.com' && password === 'admin123') {
+    if (email === 'ruchiraaofficial@gmail.com' && password === 'sm123') {
       login(email, 'admin');
       navigate('/admin');
     } else {
-      setError('Invalid credentials (Try: admin@ruchiraa.com / admin123)');
+      setError('Invalid credentials');
     }
   };
 
@@ -35,7 +35,6 @@ export const AdminLogin: React.FC = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-rose-500 focus:border-rose-500"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@ruchiraa.com"
             />
           </div>
           <div>
@@ -45,7 +44,6 @@ export const AdminLogin: React.FC = () => {
               className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-rose-500 focus:border-rose-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="admin123"
             />
           </div>
 
