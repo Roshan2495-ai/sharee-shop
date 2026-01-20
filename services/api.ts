@@ -227,6 +227,17 @@ export const api = {
     if (error) console.error("Error updating appointment status:", error);
   },
 
+  deleteSareeAppointment: async (id: string): Promise<void> => {
+    if (!isBackendLive()) return;
+
+    const { error } = await supabase
+        .from('appointments')
+        .delete()
+        .eq('id', id);
+
+    if (error) console.error("Error deleting appointment:", error);
+  },
+
   // --- AUTH (Session Management) ---
   // We keep the login session local (per device), but the Data is Global (Supabase).
   login: async (email: string): Promise<User | null> => {

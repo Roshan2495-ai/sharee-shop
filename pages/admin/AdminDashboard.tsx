@@ -8,7 +8,7 @@ export const AdminDashboard: React.FC = () => {
   const { 
     logout, 
     sareeServices, addSareeService, updateSareeService, deleteSareeService,
-    sareeAppointments, updateSareeAppointment
+    sareeAppointments, updateSareeAppointment, deleteSareeAppointment
   } = useApp();
   
   const [activeTab, setActiveTab] = useState<'dashboard' | 'services' | 'appointments' | 'settings'>('dashboard');
@@ -60,6 +60,12 @@ export const AdminDashboard: React.FC = () => {
   const handleDeleteClick = async (id: string) => {
       if(window.confirm("Are you sure you want to delete this service?")) {
           await deleteSareeService(id);
+      }
+  };
+
+  const handleDeleteAppointment = async (id: string) => {
+      if(window.confirm("Are you sure you want to permanently delete this appointment?")) {
+          await deleteSareeAppointment(id);
       }
   };
 
@@ -369,6 +375,7 @@ export const AdminDashboard: React.FC = () => {
                                     <th className="p-4">Saree</th>
                                     <th className="p-4">Status</th>
                                     <th className="p-4">Notes</th>
+                                    <th className="p-4">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y">
@@ -433,9 +440,20 @@ export const AdminDashboard: React.FC = () => {
                                                 onChange={(e) => updateSareeAppointment(appt.id, { admin_notes: e.target.value })}
                                             />
                                         </td>
+                                        <td className="p-4">
+                                            <button 
+                                                onClick={() => handleDeleteAppointment(appt.id)}
+                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded transition"
+                                                title="Delete Appointment"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </td>
                                     </tr>
                                 )})}
-                                {sareeAppointments.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-gray-500">No bookings found.</td></tr>}
+                                {sareeAppointments.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-gray-500">No bookings found.</td></tr>}
                             </tbody>
                         </table>
                     </div>

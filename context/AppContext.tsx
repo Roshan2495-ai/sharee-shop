@@ -17,6 +17,7 @@ interface AppContextType {
   sareeAppointments: SareeAppointment[];
   bookSareeAppointment: (data: Omit<SareeAppointment, 'id' | 'status' | 'created_at'>) => Promise<boolean>;
   updateSareeAppointment: (id: string, updates: Partial<SareeAppointment>) => Promise<void>;
+  deleteSareeAppointment: (id: string) => Promise<void>;
 
   // Legacy (Stubs)
   products: Product[];
@@ -100,6 +101,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSareeAppointments(prev => prev.map(a => a.id === id ? { ...a, ...updates } : a));
   };
 
+  const deleteSareeAppointment = async (id: string) => {
+    await api.deleteSareeAppointment(id);
+    setSareeAppointments(prev => prev.filter(a => a.id !== id));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -113,6 +119,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         sareeAppointments,
         bookSareeAppointment,
         updateSareeAppointment,
+        deleteSareeAppointment,
         // Legacy Stubs
         products: [],
         cart: [],
