@@ -165,8 +165,6 @@ export const api = {
         return null;
     }
 
-    // Capacity Check Removed: We allow unlimited bookings per slot.
-
     // Create Appointment Object
     const newAppt = {
       ...data,
@@ -183,10 +181,9 @@ export const api = {
         .single();
     
     if (insertError) {
-        console.warn("Initial booking failed. This might be due to a schema mismatch (e.g., missing saree_image column). Retrying with minimal data...", insertError);
+        console.warn("Initial booking failed. Retrying with minimal data...", insertError);
         
-        // Fallback Strategy: If the user hasn't updated their DB schema to include 'saree_image' or other new fields,
-        // we try to insert a minimal record so the booking still succeeds.
+        // Fallback Strategy
         const minimalAppt = {
             id: newAppt.id,
             service_id: newAppt.service_id,
@@ -227,19 +224,25 @@ export const api = {
     if (error) console.error("Error updating appointment status:", error);
   },
 
-  deleteSareeAppointment: async (id: string): Promise<void> => {
-    if (!isBackendLive()) return;
+  deleteSareeAppointment: async (id: string): Promise<boolean> => {
+    if (!isBackendLive()) {
+        console.error("Backend not live, cannot delete appointment");
+        return false;
+    }
 
     const { error } = await supabase
         .from('appointments')
         .delete()
         .eq('id', id);
 
-    if (error) console.error("Error deleting appointment:", error);
+    if (error) {
+        console.error("Error deleting appointment from DB:", error.message);
+        return false;
+    }
+    return true;
   },
 
   // --- AUTH (Session Management) ---
-  // We keep the login session local (per device), but the Data is Global (Supabase).
   login: async (email: string): Promise<User | null> => {
     if (email === 'ruchiraaofficial@gmail.com' || email === 'admin@ruchiraa.com') {
       const user: User = { id: 'u1', email, role: 'admin', name: 'Admin User' };
@@ -257,8 +260,8 @@ export const api = {
     const data = localStorage.getItem('ruchiraa_user');
     return data ? JSON.parse(data) : null;
   },
-
-  // --- Legacy Stubs (Unused) ---
+  
+  // Stubs
   getProducts: async () => [],
   getServices: async () => [],
   getOrders: async () => [],

@@ -102,8 +102,12 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   };
 
   const deleteSareeAppointment = async (id: string) => {
-    await api.deleteSareeAppointment(id);
-    setSareeAppointments(prev => prev.filter(a => a.id !== id));
+    const success = await api.deleteSareeAppointment(id);
+    if (success) {
+      setSareeAppointments(prev => prev.filter(a => a.id !== id));
+    } else {
+      alert("Failed to delete appointment from database. Please check console for permissions errors.");
+    }
   };
 
   return (
