@@ -51,8 +51,6 @@ export const api = {
         }
 
         const { data } = supabase.storage.from('hero-banners').getPublicUrl('hero-banner');
-        // We append a timestamp to the return value to help the UI clear cache, 
-        // though the getHeroBannerUrl function below is the main accessor.
         return `${data.publicUrl}?t=${Date.now()}`;
     } catch (e) {
         console.error(e);
@@ -63,6 +61,33 @@ export const api = {
   getHeroBannerUrl: (): string | null => {
       if (!isBackendLive()) return null;
       const { data } = supabase.storage.from('hero-banners').getPublicUrl('hero-banner');
+      return data.publicUrl;
+  },
+
+  uploadLogo: async (file: File): Promise<string | null> => {
+    if (!isBackendLive()) return null;
+    try {
+        // Overwrite 'site-logo' so the URL remains constant (with timestamp for caching)
+        const { error: uploadError } = await supabase.storage
+            .from('hero-banners') // Reusing the public bucket
+            .upload('site-logo', file, { upsert: true });
+
+        if (uploadError) {
+            console.error('Error uploading logo:', uploadError);
+            return null;
+        }
+
+        const { data } = supabase.storage.from('hero-banners').getPublicUrl('site-logo');
+        return `${data.publicUrl}?t=${Date.now()}`;
+    } catch (e) {
+        console.error(e);
+        return null;
+    }
+  },
+
+  getLogoUrl: (): string | null => {
+      if (!isBackendLive()) return null;
+      const { data } = supabase.storage.from('hero-banners').getPublicUrl('site-logo');
       return data.publicUrl;
   },
 

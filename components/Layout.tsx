@@ -3,9 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../context/AppContext';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useApp();
+  const { user, logoUrl } = useApp();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
 
   const isActive = (path: string) => location.pathname === path ? 'text-rose-600 font-bold' : 'text-gray-600 hover:text-rose-600';
 
@@ -16,8 +17,20 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           <div className="flex justify-between h-20 items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-2xl sm:text-3xl font-serif font-bold text-rose-700">RuChiRaa</span>
-              <span className="hidden sm:inline-block text-sm uppercase tracking-widest text-gray-500 mt-2">Services</span>
+              {logoUrl && !logoError ? (
+                <img 
+                  src={logoUrl} 
+                  alt="RuChiRaa" 
+                  className="h-16 w-auto object-contain" // Increased height slightly for better visibility
+                  onError={() => setLogoError(true)}
+                />
+              ) : (
+                <span className="text-2xl sm:text-3xl font-serif font-bold text-rose-700">RuChiRaa</span>
+              )}
+              {/* Only show 'Services' text if using text logo, or keep it as tagline? Keeping it simple. */}
+              {(!logoUrl || logoError) && (
+                <span className="hidden sm:inline-block text-sm uppercase tracking-widest text-gray-500 mt-2">Services</span>
+              )}
             </Link>
             
             {/* Desktop Menu */}

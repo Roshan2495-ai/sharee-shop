@@ -8,7 +8,8 @@ export const AdminDashboard: React.FC = () => {
   const { 
     logout, 
     sareeServices, addSareeService, updateSareeService, deleteSareeService,
-    sareeAppointments, updateSareeAppointment, deleteSareeAppointment
+    sareeAppointments, updateSareeAppointment, deleteSareeAppointment,
+    refreshLogo
   } = useApp();
   
   const [activeTab, setActiveTab] = useState<'dashboard' | 'services' | 'appointments' | 'settings'>('dashboard');
@@ -19,6 +20,7 @@ export const AdminDashboard: React.FC = () => {
   const [currentService, setCurrentService] = useState<SareeService | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [bannerUploadStatus, setBannerUploadStatus] = useState('');
+  const [logoUploadStatus, setLogoUploadStatus] = useState('');
   
   // State for deletion loading
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -104,6 +106,20 @@ export const AdminDashboard: React.FC = () => {
               setTimeout(() => setBannerUploadStatus(''), 3000);
           } else {
               setBannerUploadStatus('❌ Failed to upload. Check connection.');
+          }
+      }
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          setLogoUploadStatus('Uploading...');
+          const url = await api.uploadLogo(e.target.files[0]);
+          if (url) {
+              setLogoUploadStatus('✅ Logo Updated!');
+              refreshLogo(); // Update the whole app immediately
+              setTimeout(() => setLogoUploadStatus(''), 3000);
+          } else {
+              setLogoUploadStatus('❌ Upload Failed');
           }
       }
   };
@@ -340,7 +356,8 @@ export const AdminDashboard: React.FC = () => {
                 <div className="bg-white rounded-lg shadow p-6 md:p-8">
                     <h2 className="text-2xl font-bold mb-6">Site Settings</h2>
                     
-                    <div className="mb-8">
+                    {/* Hero Banner Upload */}
+                    <div className="mb-8 border-b border-gray-100 pb-8">
                         <h3 className="text-lg font-semibold mb-2">Homepage Hero Banner</h3>
                         <p className="text-sm text-gray-500 mb-4">Upload a new image to replace the main banner on the homepage. Recommended size: 2000x800px.</p>
                         
@@ -357,9 +374,28 @@ export const AdminDashboard: React.FC = () => {
                             )}
                         </div>
                     </div>
+
+                    {/* Site Logo Upload */}
+                    <div className="mb-8">
+                        <h3 className="text-lg font-semibold mb-2">Website Logo</h3>
+                        <p className="text-sm text-gray-500 mb-4">Upload a PNG or JPG to replace the text logo on the navigation bar. Ideal height: 100px.</p>
+                        
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center px-4 py-2 bg-gray-900 text-white rounded cursor-pointer hover:bg-gray-800 transition">
+                                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                                Upload Logo
+                                <input type="file" className="hidden" accept="image/*" onChange={handleLogoUpload} />
+                            </label>
+                            {logoUploadStatus && (
+                                <span className={`text-sm font-medium ${logoUploadStatus.includes('Updated') ? 'text-green-600' : logoUploadStatus.includes('Fail') ? 'text-red-600' : 'text-gray-600'}`}>
+                                    {logoUploadStatus}
+                                </span>
+                            )}
+                        </div>
+                    </div>
                     
                     <div className="p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-800 text-sm">
-                        <p><strong>Note:</strong> Changes to the hero banner may take a few moments to reflect on the main site due to caching.</p>
+                        <p><strong>Note:</strong> Changes to site assets may take a few moments to reflect due to caching.</p>
                     </div>
                 </div>
             )}

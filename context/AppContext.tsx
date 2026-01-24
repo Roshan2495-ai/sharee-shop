@@ -1,11 +1,15 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, SareeService, SareeAppointment, Product, CartItem, Order, Service } from '../types';
-import { api } from '../services/api';
+import { api, isBackendLive } from '../services/api';
 
 interface AppContextType {
   user: User | null;
   login: (email: string, role: 'admin' | 'user') => Promise<void>;
   logout: () => void;
+  
+  // Site Settings
+  logoUrl: string | null;
+  refreshLogo: () => void;
   
   // Core Service Data
   sareeServices: SareeService[];
@@ -42,6 +46,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [user, setUser] = useState<User | null>(null);
   const [sareeServices, setSareeServices] = useState<SareeService[]>([]);
   const [sareeAppointments, setSareeAppointments] = useState<SareeAppointment[]>([]);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
 
   // Initial Data Load
   useEffect(() => {
@@ -54,9 +59,21 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
       setUser(fetchedUser);
       setSareeServices(fetchedServices);
       setSareeAppointments(fetchedAppts);
+      
+      if (isBackendLive()) {
+          const url = api.getLogoUrl();
+          if (url) setLogoUrl(`${url}?t=${Date.now()}`);
+      }
     };
     initData();
   }, []);
+
+  const refreshLogo = () => {
+      if (isBackendLive()) {
+          const url = api.getLogoUrl();
+          if (url) setLogoUrl(`${url}?t=${Date.now()}`);
+      }
+  };
 
   const login = async (email: string, role: 'admin' | 'user') => {
     if (role === 'admin') {
@@ -116,6 +133,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         user,
         login,
         logout,
+        logoUrl,
+        refreshLogo,
         sareeServices,
         addSareeService,
         updateSareeService: updateSareeServiceState,
